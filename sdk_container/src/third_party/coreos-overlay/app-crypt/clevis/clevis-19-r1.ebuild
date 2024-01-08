@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit meson
+inherit meson systemd
 
 DESCRIPTION="Automated Encryption Framework"
 HOMEPAGE="https://github.com/latchset/clevis"
@@ -25,6 +25,11 @@ DEPEND="
 	tpm? ( app-crypt/tpm2-tools )
 "
 RDEPEND="${DEPEND}"
+# The clevis meson build will not build certain features if certain executables are not found at build time, such as `tpm2_createprimary`.
+# The meson function `find_program` that checks for the existence of the executables does not seem to search paths in ${ROOT}, but rather 
+# under `/`. An easy fix to make sure that meson finds all binaries and decides to include all features is to install all runtime dependencies
+# into the SDK.
+BDEPEND="${DEPEND}"
 
 PATCHES=(
 	# From https://github.com/latchset/clevis/pull/347
@@ -32,4 +37,17 @@ PATCHES=(
 	"${FILESDIR}/clevis-dracut.patch"
 	# Fix for systemd on Gentoo
 	"${FILESDIR}/clevis-meson.patch"
+	# Flatcar-specific fixes
+	"${FILESDIR}/clevis-dracut-flatcar.patch"
 )
+
+post_src_install() {
+	# The meson build for app-crypt/clevis installs some files to ${D}${ROOT}. After that, Portage
+	# copies from ${D} to ${ROOT}, leading to files ending up in, e.g., /build/amd64-usr/build/amd64-usr/.
+	# To fix this, we move everything from ${D}${ROOT} to ${D}.
+ 	echo ${D}${ROOT}/ to ${D}
+ 	rsync -av ${D}${ROOT}/ ${D}
+ 	rm -rfv ${D}${ROOT}
+
+ 	systemd_enable_service cryptsetup.target clevis-luks-askpass.path
+}
