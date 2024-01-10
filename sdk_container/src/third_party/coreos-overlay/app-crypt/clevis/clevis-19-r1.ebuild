@@ -12,7 +12,7 @@ SRC_URI="https://github.com/latchset/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="amd64 arm64"
-IUSE="+luks +tpm"
+IUSE="+luks +tpm +dracut"
 
 DEPEND="
 	dev-libs/jose
@@ -23,11 +23,12 @@ DEPEND="
 		dev-libs/luksmeta
 	)
 	tpm? ( app-crypt/tpm2-tools )
+	dracut? ( sys-kernel/dracut )
 "
 RDEPEND="${DEPEND}"
 # The clevis meson build will not build certain features if certain executables are not found at build time, such as `tpm2_createprimary`.
 # The meson function `find_program` that checks for the existence of the executables does not seem to search paths in ${ROOT}, but rather 
-# under `/`. An easy fix to make sure that meson finds all binaries and decides to include all features is to install all runtime dependencies
+# under `/`. A fix to make sure that meson finds all binaries and decides to include all features is to install all runtime dependencies
 # into the SDK.
 BDEPEND="${DEPEND}"
 
