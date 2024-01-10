@@ -15,22 +15,23 @@ KEYWORDS="amd64 arm64"
 IUSE="+luks +tpm +dracut"
 
 DEPEND="
+	${BDEPEND}
 	dev-libs/jose
 	sys-fs/cryptsetup
+	dracut? ( sys-kernel/dracut )
+"
+RDEPEND="${DEPEND}"
+# The clevis meson build will not build certain features if certain executables are not found at build time, such as `tpm2_createprimary`.
+# The meson function `find_program` that checks for the existence of the executables does not seem to search paths in ${ROOT}, but rather 
+# under `/`. A fix to make meson find all binaries and include all desired features is to install such runtime dependencies into the SDK.
+BDEPEND="
 	luks? (
 		app-misc/jq
 		dev-libs/libpwquality
 		dev-libs/luksmeta
 	)
 	tpm? ( app-crypt/tpm2-tools )
-	dracut? ( sys-kernel/dracut )
 "
-RDEPEND="${DEPEND}"
-# The clevis meson build will not build certain features if certain executables are not found at build time, such as `tpm2_createprimary`.
-# The meson function `find_program` that checks for the existence of the executables does not seem to search paths in ${ROOT}, but rather 
-# under `/`. A fix to make sure that meson finds all binaries and decides to include all features is to install all runtime dependencies
-# into the SDK.
-BDEPEND="${DEPEND}"
 
 PATCHES=(
 	# From https://github.com/latchset/clevis/pull/347
