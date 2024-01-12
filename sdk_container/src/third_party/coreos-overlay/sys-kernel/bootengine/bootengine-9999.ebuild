@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-CROS_WORKON_PROJECT="flatcar/bootengine"
+CROS_WORKON_PROJECT="simoncampion/bootengine"
 CROS_WORKON_LOCALNAME="bootengine"
 CROS_WORKON_OUTOFTREE_BUILD=1
 CROS_WORKON_REPO="https://github.com"
@@ -10,7 +10,7 @@ CROS_WORKON_REPO="https://github.com"
 if [[ "${PV}" == 9999 ]]; then
 	KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 else
-	CROS_WORKON_COMMIT="0bade95d3b33b75b6c827d2db2f9298aff0ca05f" # flatcar-master
+	CROS_WORKON_COMMIT="32419d727df92c9212b9b7405ccb95922c8fd4d4"
 	KEYWORDS="amd64 arm arm64 x86"
 fi
 
@@ -38,10 +38,9 @@ src_install() {
 		"${D}"/usr/lib/dracut/modules.d/30ignition/ignition-setup-pre.sh \
 		"${D}"/usr/lib/dracut/modules.d/30ignition/ignition-kargs-helper \
 		"${D}"/usr/lib/dracut/modules.d/30ignition/retry-umount.sh \
+		"${D}"/usr/lib/dracut/modules.d/40networkd-dependency/*-generator \
 		"${D}"/usr/lib/dracut/modules.d/99setup-root/initrd-setup-root \
 		"${D}"/usr/lib/dracut/modules.d/99setup-root/initrd-setup-root-after-ignition \
 		"${D}"/usr/lib/dracut/modules.d/99setup-root/gpg-agent-wrapper \
-		"${D}"/usr/lib/dracut/modules.d/30ignition/coreos-metadata-wrapper \
-		"${D}"/usr/lib/dracut/modules.d/30ignition/ignition-wrapper \
 		|| die chmod
 }
